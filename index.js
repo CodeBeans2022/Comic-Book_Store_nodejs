@@ -89,7 +89,7 @@ route.get('/', (req, res) => {
 });
 
 route.get('/users', function (req,res) {
-    db.query('select * from Users', (err, data) => {
+    db.query('select firstName, lastName, emailAdd, country from Users', (err, data) => {
         if (err) {
          console.log(err);   
         }
@@ -99,7 +99,7 @@ route.get('/users', function (req,res) {
     });
 });
 
-route.post('/register', (req, res) => {
+route.post('/register', bodyParser.json(), (req, res) => {
     let strQry = `insert into Users set ?`;
 
     db.query(strQry, [detail], (err) => {
