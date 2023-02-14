@@ -41,6 +41,18 @@
 
 let express = require('express');
 
+//Path
+
+let path = require('path');
+
+//DB
+
+let db = require('./config');
+
+// Body-parser
+
+let bodyParser = require('body-parser');
+
 //Port
 
 let port = parseInt(process.env.port) || 4000;
@@ -52,14 +64,52 @@ let app = express();
 
 let route = express.Router();
 
+// MySQL
+
+
+
 app.use(
-    route
+    route,
+    express.json,
+    bodyParser.urlencoded({extended: false}),
 )
 
 //Home or /
 
+// route.get('/', (req, res) => {
+//     res.status(200).send('Well Done');
+// });
+
+// app.listen(port, () => {
+//     console.log(`Server is running at ${port}`); 
+// });
+
 route.get('/', (req, res) => {
-    res.status(200).send('Well Done');
+    res.status(200).sendFile(path.join(__dirname, './view/index.html'));
+});
+
+route.get('/users', function (req,res) {
+    db.query('select * from Users', (err, data) => {
+        if (err) {
+         console.log(err);   
+        }
+        else{
+            res.status(200).json( {results: data} )
+        }
+    });
+});
+
+route.post('/register', (req, res) => {
+    let strQry = `insert into Users set ?`;
+
+    db.query(strQry, [detail], (err) => {
+        if(err) {
+            res.status(400).json({err});
+        }
+        else{
+            res.status(200).json({msg: 'A user was saved.'});
+        }
+    });
 });
 
 app.listen(port, () => {
