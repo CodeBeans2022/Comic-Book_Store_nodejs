@@ -89,7 +89,7 @@ route.get('/', (req, res) => {
 });
 
 route.get('/users', function (req,res) {
-    db.query('select firstName, lastName, emailAdd, country from Users', (err, data) => {
+    db.query('select default, firstName, lastName, emailAdd, country from Users', (err, data) => {
         if (err) {
          console.log(err);   
         }
@@ -100,6 +100,7 @@ route.get('/users', function (req,res) {
 });
 
 route.post('/register', bodyParser.json(), (req, res) => {
+    let detail = req.body;
     let strQry = `insert into Users set ?`;
 
     db.query(strQry, [detail], (err) => {
@@ -111,6 +112,30 @@ route.post('/register', bodyParser.json(), (req, res) => {
         }
     });
 });
+
+route.put('/user/:id', bodyParser.json(), (req, res)  => {
+    let detail = req.body;
+    let update = `update Users set ? where userID = ?`;
+
+    db.query(update, [detail, req.params.id],  (err) => {
+        if(err) {
+            res.status(400).json( {err: 'An error occurred'});
+        }
+        else{
+            res.status(200).json( {msg: 'Updated'});
+        }
+    });
+});
+
+route.delete('/user/:id', (req, res) => {
+    let remove = `delete from Users where userID = ?;`
+
+    db.query(remove, [req.params.id], (err) => {
+        if(err) throw err;
+        res.status(200).json({msg: 'A record was removed from database'})
+    })
+})
+
 
 app.listen(port, () => {
     console.log(`Server is running at ${port}`);
